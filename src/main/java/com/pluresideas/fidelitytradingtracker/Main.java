@@ -1,12 +1,12 @@
-package org.pluresideas.fidelitytradingtracker;
+package com.pluresideas.fidelitytradingtracker;
 
-import org.pluresideas.fidelitytradingtracker.model.Transaction;
-import org.pluresideas.fidelitytradingtracker.parser.CsvParser;
-import org.pluresideas.fidelitytradingtracker.parser.FidelityCsvParser;
-import org.pluresideas.fidelitytradingtracker.report.FidelityTrackerReport;
-import org.pluresideas.fidelitytradingtracker.report.Report;
-import org.pluresideas.fidelitytradingtracker.service.CalculationResults;
-import org.pluresideas.fidelitytradingtracker.service.PortfolioCalculator;
+import com.pluresideas.fidelitytradingtracker.model.Transaction;
+import com.pluresideas.fidelitytradingtracker.parser.CsvParser;
+import com.pluresideas.fidelitytradingtracker.parser.FidelityCsvParser;
+import com.pluresideas.fidelitytradingtracker.report.FidelityTrackerReport;
+import com.pluresideas.fidelitytradingtracker.report.Report;
+import com.pluresideas.fidelitytradingtracker.service.CalculationResults;
+import com.pluresideas.fidelitytradingtracker.service.PortfolioCalculator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +44,7 @@ public class Main {
 
     private static void printUsage() {
         logger.error("Error: Missing mandatory arguments.");
-        logger.info("Usage: java -cp ... org.pluresideas.fidelitytradingtracker.Main <path-to-accounts-history-csv> [<path-to-ignore-symbols-txt>]");
+        logger.info("Usage: java -cp ... fidelitytradingtracker.pluresideas.com.Main <path-to-accounts-history-csv> [<path-to-ignore-symbols-txt>]");
         logger.info("Arguments:");
         logger.info("  <path-to-accounts-history-csv> : Path to the exported Fidelity transaction history CSV file containing your trade logs.");
         logger.info("  [<path-to-ignore-symbols-txt>]  : (Optional) Path to a plain text file containing stock symbols to ignore (one ticker per line, e.g. SPAXX).");

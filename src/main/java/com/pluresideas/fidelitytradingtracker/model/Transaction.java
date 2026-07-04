@@ -1,4 +1,4 @@
-package org.pluresideas.fidelitytradingtracker.model;
+package com.pluresideas.fidelitytradingtracker.model;
 
 /**
  * Represents a single trading transaction parsed from the Fidelity history CSV.

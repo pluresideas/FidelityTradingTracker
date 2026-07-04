@@ -1,8 +1,8 @@
-package org.pluresideas.fidelitytradingtracker.report;
+package com.pluresideas.fidelitytradingtracker.report;
 
-import org.pluresideas.fidelitytradingtracker.model.Account;
-import org.pluresideas.fidelitytradingtracker.model.RoundTrip;
-import org.pluresideas.fidelitytradingtracker.service.CalculationResults;
+import com.pluresideas.fidelitytradingtracker.model.Account;
+import com.pluresideas.fidelitytradingtracker.model.RoundTrip;
+import com.pluresideas.fidelitytradingtracker.service.CalculationResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,7 +1,7 @@
-package org.pluresideas.fidelitytradingtracker.parser;
+package com.pluresideas.fidelitytradingtracker.parser;
 
-import org.pluresideas.fidelitytradingtracker.model.Action;
-import org.pluresideas.fidelitytradingtracker.model.Transaction;
+import com.pluresideas.fidelitytradingtracker.model.Action;
+import com.pluresideas.fidelitytradingtracker.model.Transaction;
 
 import java.io.IOException;
 import java.nio.file.Files;

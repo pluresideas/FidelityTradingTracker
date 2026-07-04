@@ -1,8 +1,8 @@
-package org.pluresideas.fidelitytradingtracker.service;
+package com.pluresideas.fidelitytradingtracker.service;
 
-import org.pluresideas.fidelitytradingtracker.model.Account;
-import org.pluresideas.fidelitytradingtracker.model.RoundTrip;
-import org.pluresideas.fidelitytradingtracker.model.Transaction;
+import com.pluresideas.fidelitytradingtracker.model.Account;
+import com.pluresideas.fidelitytradingtracker.model.RoundTrip;
+import com.pluresideas.fidelitytradingtracker.model.Transaction;
 
 import java.util.List;
 import java.util.Map;

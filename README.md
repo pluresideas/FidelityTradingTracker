@@ -71,18 +71,18 @@ mvn compile dependency:copy-dependencies
 
 ```bash
 # With ignore symbols config file
-java -cp "target/classes:target/dependency/*" org.pluresideas.fidelitytradingtracker.Main input_files/Accounts_History.csv input_files/IgnoreSymbols.txt
+java -cp "target/classes:target/dependency/*" fidelitytradingtracker.pluresideas.com.Main input_files/Accounts_History.csv input_files/IgnoreSymbols.txt
 
 # Without ignore symbols config file
-java -cp "target/classes:target/dependency/*" org.pluresideas.fidelitytradingtracker.Main input_files/Accounts_History.csv
+java -cp "target/classes:target/dependency/*" fidelitytradingtracker.pluresideas.com.Main input_files/Accounts_History.csv
 ```
 
 #### **On Windows** (uses `;` as path separator):
 
 ```bash
 # With ignore symbols config file
-java -cp "target/classes;target/dependency/*" org.pluresideas.fidelitytradingtracker.Main input_files/Accounts_History.csv input_files/IgnoreSymbols.txt
+java -cp "target/classes;target/dependency/*" fidelitytradingtracker.pluresideas.com.Main input_files/Accounts_History.csv input_files/IgnoreSymbols.txt
 
 # Without ignore symbols config file
-java -cp "target/classes;target/dependency/*" org.pluresideas.fidelitytradingtracker.Main input_files/Accounts_History.csv
+java -cp "target/classes;target/dependency/*" fidelitytradingtracker.pluresideas.com.Main input_files/Accounts_History.csv
 ```

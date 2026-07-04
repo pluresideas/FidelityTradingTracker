@@ -1,4 +1,4 @@
-package org.pluresideas.fidelitytradingtracker.model;
+package com.pluresideas.fidelitytradingtracker.model;
 
 public class RoundTrip {
 
