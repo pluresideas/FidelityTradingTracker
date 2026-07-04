@@ -1,11 +1,14 @@
-package org.example.parser;
+package org.pluresideas.fidelitytradingtracker.parser;
 
-import org.example.model.Transaction;
-import org.example.model.Action;
+import org.pluresideas.fidelitytradingtracker.model.Action;
+import org.pluresideas.fidelitytradingtracker.model.Transaction;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class FidelityCsvParser implements CsvParser {
 
@@ -47,14 +50,14 @@ public class FidelityCsvParser implements CsvParser {
             double amount = parseDoubleSafely(fields.get(12));
 
             Transaction tx = new Transaction(
-                dateField,
-                fields.get(1),
-                fields.get(2),
-                isBuy ? Action.BUY : Action.SELL,
-                symbol,
-                price,
-                quantity,
-                amount
+                    dateField,
+                    fields.get(1),
+                    fields.get(2),
+                    isBuy ? Action.BUY : Action.SELL,
+                    symbol,
+                    price,
+                    quantity,
+                    amount
             );
             transactions.add(tx);
         }

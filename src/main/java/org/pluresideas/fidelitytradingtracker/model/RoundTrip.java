@@ -1,4 +1,4 @@
-package org.example.model;
+package org.pluresideas.fidelitytradingtracker.model;
 
 public class RoundTrip {
 
@@ -44,16 +44,45 @@ public class RoundTrip {
         this.isClosed = true;
     }
 
-    public String getSymbol() { return symbol; }
-    public String getOpenDate() { return openDate; }
-    public String getCloseDate() { return closeDate; }
-    public double getTotalBuyQty() { return totalBuyQty; }
-    public double getTotalSellQty() { return totalSellQty; }
-    public double getTotalBuyValue() { return totalBuyValue; }
-    public double getTotalSellValue() { return totalSellValue; }
-    public double getRealizedPnL() { return realizedPnL; }
-    public boolean isClosed() { return isClosed; }
-    public boolean isEstimated() { return isEstimated; }
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public String getOpenDate() {
+        return openDate;
+    }
+
+    public String getCloseDate() {
+        return closeDate;
+    }
+
+    public double getTotalBuyQty() {
+        return totalBuyQty;
+    }
+
+    public double getTotalSellQty() {
+        return totalSellQty;
+    }
+
+    public double getTotalBuyValue() {
+        return totalBuyValue;
+    }
+
+    public double getTotalSellValue() {
+        return totalSellValue;
+    }
+
+    public double getRealizedPnL() {
+        return realizedPnL;
+    }
+
+    public boolean isClosed() {
+        return isClosed;
+    }
+
+    public boolean isEstimated() {
+        return isEstimated;
+    }
 
     public double getAvgBuyPrice() {
         return totalBuyQty > 0 ? totalBuyValue / totalBuyQty : 0.0;

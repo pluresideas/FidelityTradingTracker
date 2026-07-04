@@ -1,6 +1,7 @@
-package org.example.parser;
+package org.pluresideas.fidelitytradingtracker.parser;
 
-import org.example.model.Transaction;
+import org.pluresideas.fidelitytradingtracker.model.Transaction;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;

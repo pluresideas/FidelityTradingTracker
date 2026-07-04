@@ -1,11 +1,11 @@
-package org.example.service;
+package org.pluresideas.fidelitytradingtracker.service;
 
-import org.example.model.Account;
-import org.example.model.Action;
-import org.example.model.RoundTrip;
-import org.example.model.Transaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.pluresideas.fidelitytradingtracker.model.Account;
+import org.pluresideas.fidelitytradingtracker.model.Action;
+import org.pluresideas.fidelitytradingtracker.model.RoundTrip;
+import org.pluresideas.fidelitytradingtracker.model.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;

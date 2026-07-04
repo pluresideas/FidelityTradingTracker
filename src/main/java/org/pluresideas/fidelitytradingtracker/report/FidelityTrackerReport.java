@@ -1,11 +1,15 @@
-package org.example.report;
+package org.pluresideas.fidelitytradingtracker.report;
 
-import org.example.model.Account;
-import org.example.model.RoundTrip;
-import org.example.service.CalculationResults;
+import org.pluresideas.fidelitytradingtracker.model.Account;
+import org.pluresideas.fidelitytradingtracker.model.RoundTrip;
+import org.pluresideas.fidelitytradingtracker.service.CalculationResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
 
 public class FidelityTrackerReport implements Report {
     private static final Logger logger = LoggerFactory.getLogger(FidelityTrackerReport.class);
@@ -80,12 +84,12 @@ public class FidelityTrackerReport implements Report {
         sortedAccounts.sort(Comparator.comparing(Account::getName));
         for (Account acc : sortedAccounts) {
             logger.info(String.format("  %-25s %-12s %8d %18s %18s %18s",
-                acc.getName(),
-                acc.getAccountNumber() != null ? acc.getAccountNumber() : "N/A",
-                acc.getTradesCount(),
-                formatMoney(acc.getBuysValue()),
-                formatMoney(acc.getSellsValue()),
-                formatMoney(acc.getNetCashFlow())
+                    acc.getName(),
+                    acc.getAccountNumber() != null ? acc.getAccountNumber() : "N/A",
+                    acc.getTradesCount(),
+                    formatMoney(acc.getBuysValue()),
+                    formatMoney(acc.getSellsValue()),
+                    formatMoney(acc.getNetCashFlow())
             ));
         }
         logger.info("------------------------------------------------------------------------------------------------------------------------");
@@ -96,7 +100,7 @@ public class FidelityTrackerReport implements Report {
         logger.info("[3] DETAILED TRANSACTIONS BY SYMBOL (Round-Trip Ledger)");
         logger.info("------------------------------------------------------------------------------------------------------------------------");
         logger.info(String.format("  %-10s %-10s %-8s %10s %12s %12s %14s %14s %15s",
-            "Open Date", "Close Date", "Symbol", "Qty", "Avg Buy", "Avg Sell", "Cost Basis", "Proceeds", "Realized P&L"));
+                "Open Date", "Close Date", "Symbol", "Qty", "Avg Buy", "Avg Sell", "Cost Basis", "Proceeds", "Realized P&L"));
         logger.info("  ----------------------------------------------------------------------------------------------------------------------");
 
         List<RoundTrip> sortedTransactionsBySymbol = new ArrayList<>(r.roundTrips());
@@ -116,9 +120,9 @@ public class FidelityTrackerReport implements Report {
             String proceedsStr = rt.getTotalSellQty() > 0 ? formatMoney(rt.getTotalSellValue()) : "-";
 
             logger.info(String.format("  %-10s %-10s %-8s %10s %12s %12s %14s %14s %15s",
-                rt.getOpenDate() != null ? rt.getOpenDate() : "N/A", rt.getCloseDate(), rt.getSymbol(), formatQty(rt.getTotalBuyQty()),
-                formatMoney(rt.getAvgBuyPrice()), avgSellStr, formatMoney(rt.getTotalBuyValue()),
-                proceedsStr, pnlStr));
+                    rt.getOpenDate() != null ? rt.getOpenDate() : "N/A", rt.getCloseDate(), rt.getSymbol(), formatQty(rt.getTotalBuyQty()),
+                    formatMoney(rt.getAvgBuyPrice()), avgSellStr, formatMoney(rt.getTotalBuyValue()),
+                    proceedsStr, pnlStr));
         }
         logger.info("------------------------------------------------------------------------------------------------------------------------");
         logger.info("");
@@ -128,7 +132,7 @@ public class FidelityTrackerReport implements Report {
         logger.info("[4] DETAILED TRANSACTIONS BY P&L (Descending)");
         logger.info("------------------------------------------------------------------------------------------------------------------------");
         logger.info(String.format("  %-10s %-10s %-8s %10s %12s %12s %14s %14s %15s",
-            "Open Date", "Close Date", "Symbol", "Qty", "Avg Buy", "Avg Sell", "Cost Basis", "Proceeds", "Realized P&L"));
+                "Open Date", "Close Date", "Symbol", "Qty", "Avg Buy", "Avg Sell", "Cost Basis", "Proceeds", "Realized P&L"));
         logger.info("  ----------------------------------------------------------------------------------------------------------------------");
 
         List<RoundTrip> sellTransactionsSortedByPnL = new ArrayList<>();
@@ -145,9 +149,9 @@ public class FidelityTrackerReport implements Report {
             String proceedsStr = rt.getTotalSellQty() > 0 ? formatMoney(rt.getTotalSellValue()) : "-";
 
             logger.info(String.format("  %-10s %-10s %-8s %10s %12s %12s %14s %14s %15s",
-                rt.getOpenDate() != null ? rt.getOpenDate() : "N/A", rt.getCloseDate(), rt.getSymbol(), formatQty(rt.getTotalBuyQty()),
-                formatMoney(rt.getAvgBuyPrice()), avgSellStr, formatMoney(rt.getTotalBuyValue()),
-                proceedsStr, pnlStr));
+                    rt.getOpenDate() != null ? rt.getOpenDate() : "N/A", rt.getCloseDate(), rt.getSymbol(), formatQty(rt.getTotalBuyQty()),
+                    formatMoney(rt.getAvgBuyPrice()), avgSellStr, formatMoney(rt.getTotalBuyValue()),
+                    proceedsStr, pnlStr));
         }
         logger.info("------------------------------------------------------------------------------------------------------------------------");
         logger.info("");
@@ -157,7 +161,7 @@ public class FidelityTrackerReport implements Report {
         logger.info("[5] DETAILED TRANSACTIONS BY DATE (Chronological)");
         logger.info("------------------------------------------------------------------------------------------------------------------------");
         logger.info(String.format("  %-10s %-10s %-8s %10s %12s %12s %14s %14s %15s",
-            "Open Date", "Close Date", "Symbol", "Qty", "Avg Buy", "Avg Sell", "Cost Basis", "Proceeds", "Realized P&L"));
+                "Open Date", "Close Date", "Symbol", "Qty", "Avg Buy", "Avg Sell", "Cost Basis", "Proceeds", "Realized P&L"));
         logger.info("  ----------------------------------------------------------------------------------------------------------------------");
 
         List<RoundTrip> sortedTransactionsByDate = new ArrayList<>(r.roundTrips());
@@ -177,9 +181,9 @@ public class FidelityTrackerReport implements Report {
             String proceedsStr = rt.getTotalSellQty() > 0 ? formatMoney(rt.getTotalSellValue()) : "-";
 
             logger.info(String.format("  %-10s %-10s %-8s %10s %12s %12s %14s %14s %15s",
-                rt.getOpenDate() != null ? rt.getOpenDate() : "N/A", rt.getCloseDate(), rt.getSymbol(), formatQty(rt.getTotalBuyQty()),
-                formatMoney(rt.getAvgBuyPrice()), avgSellStr, formatMoney(rt.getTotalBuyValue()),
-                proceedsStr, pnlStr));
+                    rt.getOpenDate() != null ? rt.getOpenDate() : "N/A", rt.getCloseDate(), rt.getSymbol(), formatQty(rt.getTotalBuyQty()),
+                    formatMoney(rt.getAvgBuyPrice()), avgSellStr, formatMoney(rt.getTotalBuyValue()),
+                    proceedsStr, pnlStr));
         }
         logger.info("------------------------------------------------------------------------------------------------------------------------");
     }

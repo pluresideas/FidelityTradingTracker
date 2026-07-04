@@ -1,4 +1,4 @@
-package org.example.model;
+package org.pluresideas.fidelitytradingtracker.model;
 
 public class Account {
     private final String name;
