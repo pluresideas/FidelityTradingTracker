@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -58,20 +59,40 @@ public class FidelityTrackerReport implements Report {
 
         int closedRoundTripsCount = 0;
         int winningRoundTripsCount = 0;
+        BigDecimal sumGains = BigDecimal.ZERO;
+        int gainCount = 0;
+        BigDecimal sumLosses = BigDecimal.ZERO;
+        int lossCount = 0;
+
         for (RoundTrip rt : r.roundTrips()) {
             if (rt.isClosed()) {
                 closedRoundTripsCount++;
-                if (rt.getRealizedPnL().compareTo(BigDecimal.ZERO) > 0) {
+                BigDecimal pnl = rt.getRealizedPnL();
+                BigDecimal pct = rt.getReturnPercentage();
+                if (pnl.compareTo(BigDecimal.ZERO) > 0) {
                     winningRoundTripsCount++;
+                    sumGains = sumGains.add(pct);
+                    gainCount++;
+                } else if (pnl.compareTo(BigDecimal.ZERO) < 0) {
+                    sumLosses = sumLosses.add(pct);
+                    lossCount++;
                 }
             }
         }
         double transactionWinRate = closedRoundTripsCount > 0 ? ((double) winningRoundTripsCount / closedRoundTripsCount * 100.0) : 0.0;
 
+        BigDecimal avgGain = gainCount > 0 ? sumGains.divide(new BigDecimal(gainCount), MathContext.DECIMAL128) : null;
+        BigDecimal avgLoss = lossCount > 0 ? sumLosses.divide(new BigDecimal(lossCount), MathContext.DECIMAL128) : null;
+
+        String avgGainStr = avgGain != null ? formatPercentage(avgGain) : "N/A";
+        String avgLossStr = avgLoss != null ? formatPercentage(avgLoss) : "N/A";
+
         logger.info(String.format("  Total Realized P&L:        %s%s", formatMoney(r.totalRealizedPnL()), r.hasIncompleteHistory() ? "*" : ""));
         logger.info(String.format("  Win Rate (by Transaction): %.1f%% (%d of %d completed transactions)", transactionWinRate, winningRoundTripsCount, closedRoundTripsCount));
         logger.info(String.format("  Win Rate (by Sell):        %.1f%% (%d of %d profitable sells)", sellWinRate, r.winningSellsCount(), r.totalSellsCount()));
-        logger.info(HORIZONTAL_SEPARATOR);
+        logger.info(String.format("  Average Gain (%%):          %s (across %d profitable transactions)", avgGainStr, gainCount));
+        logger.info(String.format("  Average Loss (%%):          %s (across %d unprofitable transactions)", avgLossStr, lossCount));
+        logger.info("------------------------------------------------------------------------------------------------------------------------");
         logger.info("");
     }
 
