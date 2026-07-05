@@ -62,20 +62,9 @@ public class FidelityCsvParser implements CsvParser {
             transactions.add(tx);
         }
 
-        // Sort transactions chronologically (oldest first). For transactions on the same day, sort BUY before SELL.
-        transactions.sort((t1, t2) -> {
-            String d1 = getComparableDate(t1.date());
-            String d2 = getComparableDate(t2.date());
-            int dateComp = d1.compareTo(d2);
-            if (dateComp != 0) {
-                return dateComp;
-            }
-            if (t1.action() == t2.action()) {
-                return 0;
-            }
-            return t1.action() == Action.BUY ? -1 : 1;
-        });
-
+        // Reversing the parsed list because Fidelity CSV exports are always in reverse chronological order (newest first).
+        // Reversing naturally puts them in correct chronological order (oldest first) while preserving transaction blocks.
+        java.util.Collections.reverse(transactions);
         return transactions;
     }
 

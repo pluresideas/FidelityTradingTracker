@@ -81,18 +81,40 @@ class PortfolioCalculatorTest {
 
     @Test
     void testIncompleteHistoryEstimatedPnL() {
-        // Sell 10 shares of AAPL at $160 without any previous buys
+        // Sell 10 shares of AAPL at $160 without any previous buys (starts with sell, no transaction should be created)
         transactions.add(new Transaction("05-01-2026", "Individual Account", "A123", Action.SELL, "AAPL", 160.0, 10.0, 1600.0));
 
         CalculationResults results = calculator.calculate(transactions);
 
         assertTrue(results.hasIncompleteHistory());
-        assertEquals(0.0, results.totalRealizedPnL(), 0.001); // Realized P&L is estimated as $0 since cost basis matches selling price
+        assertEquals(0.0, results.totalRealizedPnL(), 0.001);
+
+        List<RoundTrip> roundTrips = results.roundTrips();
+        assertTrue(roundTrips.isEmpty()); // Cannot start a transaction with a sell
+    }
+
+    @Test
+    void testIncompleteHistoryPartialMissingBuys() {
+        // Buy 5 shares at $100
+        transactions.add(new Transaction("05-01-2026", "Individual Account", "A123", Action.BUY, "AAPL", 100.0, 5.0, -500.0));
+        // Sell 10 shares at $120 (5 shares have buy history, 5 shares do not)
+        transactions.add(new Transaction("05-02-2026", "Individual Account", "A123", Action.SELL, "AAPL", 120.0, 10.0, 1200.0));
+
+        CalculationResults results = calculator.calculate(transactions);
+
+        assertTrue(results.hasIncompleteHistory());
+        // 5 shares sold at 120 with cost basis 100 -> P&L = +100
+        // 5 shares sold at 120 with no cost basis -> P&L = +0
+        assertEquals(100.0, results.totalRealizedPnL(), 0.001);
 
         List<RoundTrip> roundTrips = results.roundTrips();
         assertEquals(1, roundTrips.size());
         RoundTrip rt = roundTrips.get(0);
+        assertTrue(rt.isClosed());
         assertTrue(rt.isEstimated());
+        assertEquals(5.0, rt.getTotalBuyQty());
+        assertEquals(5.0, rt.getTotalSellQty()); // capped at owned buy qty
+        assertEquals(100.0, rt.getRealizedPnL());
     }
 
     @Test

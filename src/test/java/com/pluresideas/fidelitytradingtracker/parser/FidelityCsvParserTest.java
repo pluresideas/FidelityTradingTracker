@@ -38,8 +38,8 @@ class FidelityCsvParserTest {
         // Col 0: Run Date, Col 1: Account, Col 2: Account Num, Col 3: Action, Col 4: Symbol, Col 5: Description, Col 6: Type, Col 7: Price, Col 8: Quantity, Col 9: Commission, Col 10: Fees, Col 11: Interest, Col 12: Amount
         String content = """
                 Run Date,Account,Account #,Action,Symbol,Description,Type,Price,Quantity,Commission,Fees,Interest,Amount
-                05/01/2026,Individual,A123,YOU BOUGHT AAPL,AAPL,APPLE INC,Cash,150.00,10.0,"","","",-1500.00
                 05/01/2026,Individual,A123,YOU SOLD AAPL,AAPL,APPLE INC,Cash,160.00,-10.0,"","","",1600.00
+                05/01/2026,Individual,A123,YOU BOUGHT AAPL,AAPL,APPLE INC,Cash,150.00,10.0,"","","",-1500.00
                 """;
 
         Files.writeString(tempFile, content);

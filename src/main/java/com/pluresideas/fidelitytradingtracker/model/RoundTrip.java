@@ -27,8 +27,12 @@ public class RoundTrip {
     }
 
     public void addSell(Transaction t) {
-        totalSellQty += t.quantity();
-        totalSellValue += Math.abs(t.amount());
+        addSell(t.quantity(), t.price());
+    }
+
+    public void addSell(double qty, double price) {
+        totalSellQty += qty;
+        totalSellValue += qty * price;
     }
 
     public void addPnL(double pnl) {

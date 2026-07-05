@@ -108,21 +108,23 @@ public class PortfolioCalculator {
 
                 // RoundTrip logic
                 RoundTrip rt = activeRoundTrips.get(sym);
-                if (rt == null) {
-                    rt = new RoundTrip(sym);
-                    activeRoundTrips.put(sym, rt);
-                    allRoundTrips.add(rt);
-                    rt.setEstimated(true);
-                }
-                rt.addSell(t);
-                rt.addPnL(pnl);
-                if (incomplete) {
-                    rt.setEstimated(true);
-                }
-
-                if (newShares == 0.0) {
-                    rt.close(t.date());
-                    activeRoundTrips.remove(sym);
+                if (rt != null) {
+                    double sellQtyForRoundTrip = qty;
+                    double pnlForRoundTrip = pnl;
+                    if (qty > currentShares) {
+                        sellQtyForRoundTrip = currentShares;
+                        pnlForRoundTrip = (currentShares * t.price()) - (currentShares * currentAvgCost);
+                        rt.setEstimated(true);
+                    }
+                    rt.addSell(sellQtyForRoundTrip, t.price());
+                    rt.addPnL(pnlForRoundTrip);
+                    if (incomplete) {
+                        rt.setEstimated(true);
+                    }
+                    if (newShares == 0.0) {
+                        rt.close(t.date());
+                        activeRoundTrips.remove(sym);
+                    }
                 }
             }
         }

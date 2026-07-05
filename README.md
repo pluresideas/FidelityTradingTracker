@@ -7,7 +7,8 @@ A lightweight, robust Java application that parses Fidelity transaction history 
 ## Key Features
 
 - **Standard CSV Parsing Engine**: A custom, zero-dependency CSV state machine parser that gracefully handles empty lines, quoted fields containing spaces or commas, headers, and file footnotes.
-- **Chronological Sorting & Intraday Alignment**: Re-orders transactions chronologically and prioritizes intraday **BUY** orders before **SELL** orders to ensure cost basis tracking is accurate and prevents artificial short-selling errors.
+- **Sequential Processing & Intraday Alignment**: Processes transactions chronologically in their exact execution sequence by reversing the reverse-chronological Fidelity export. This preserves intraday transaction blocks and handles multiple distinct trade cycles on the same day without merging them.
+- **Round-Trip Transaction Tracking**: Matches BUY lots to SELL lots sequentially. A round-trip trade starts with a purchase and closes once the accumulated shares owned in that cycle reach zero. Sells without matching purchases do not start a transaction, and partial exits only close up to the owned buy positions.
 - **Average Cost Basis & Realized P&L**: Calculates running average cost basis for open holdings and computes exact realized Profit & Loss for completed trades. If historical buy data is missing, calculations gracefully fall back to estimated values.
 - **Exclusion Filter**: Easily filter out cash-equivalent funds (e.g., money markets like `SPAXX`) or index funds (e.g., `FZROX`, `FZILX`) by listing them in a blacklist config file.
 - **Comprehensive Terminal Reporting**: Generates a detailed multi-section report including:
