@@ -87,5 +87,13 @@ public class Main {
     private static void renderReport(String inputPath, CalculationResults results) {
         Report report = new FidelityTrackerReport(inputPath);
         report.render(results);
+
+        try {
+            com.pluresideas.fidelitytradingtracker.report.HtmlReportGenerator htmlGen = new com.pluresideas.fidelitytradingtracker.report.HtmlReportGenerator();
+            htmlGen.generate(results, "report.html");
+            logger.info("HTML Visual Report generated successfully: file://" + Paths.get("report.html").toAbsolutePath().toString());
+        } catch (IOException e) {
+            logger.error("Failed to generate HTML visual report: {}", e.getMessage());
+        }
     }
 }

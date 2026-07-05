@@ -93,18 +93,23 @@ java -cp "target/classes;target/dependency/*" com.pluresideas.fidelitytradingtra
 Compile the project into a standalone platform-native binary (e.g. `fidelity-tracker` on macOS/Linux or `fidelity-tracker.exe` on Windows). This executable starts instantly and runs without requiring any Java JRE or Maven installed on the target machine.
 
 #### Prerequisites
+
 1. Install a GraalVM JDK (e.g., `brew install --cask graalvm-jdk` on macOS or via [SDKMAN](https://sdkman.io/) using `sdk install java 22.0.2-graalce`).
 2. Ensure you have local developer compiler tools (e.g., `xcode-select --install` on macOS).
 3. Set your `JAVA_HOME` environment variable to the GraalVM JDK directory (e.g., `export JAVA_HOME="/Library/Java/JavaVirtualMachines/graalvm-25.jdk/Contents/Home"`).
 
 #### Compilation
+
 Build the native binary by running:
+
 ```bash
 mvn -Pnative native:compile
 ```
 
 #### Run the Executable
+
 Once completed, run the binary generated in the `target/` directory:
+
 ```bash
 # With ignore symbols
 ./target/fidelity-tracker input_files/Accounts_History.csv input_files/IgnoreSymbols.txt
@@ -112,3 +117,31 @@ Once completed, run the binary generated in the `target/` directory:
 # Without ignore symbols
 ./target/fidelity-tracker input_files/Accounts_History.csv
 ```
+
+---
+
+## Interactive HTML Dashboard & Cumulative P&L
+
+In addition to the console-based report, the application automatically generates a modern, interactive HTML/JS dashboard file at `report.html` in your project root directory.
+
+### Features
+
+* **Key Performance Indicators**: Four modern cards displaying:
+  * **Net Realized P&L**: Total net dollar profit/loss along with the average gain and loss percentages of individual completed trades (e.g. `Avg Gain: +X% | Avg Loss: -Y%`).
+  * **Win Rate**: The percentage of completed round-trip transactions that were profitable, with the exact count of winning/total completed trades.
+  * **Total Completed Trades**: The total count of completed round-trips alongside the raw count of individual executions parsed from the file.
+  * **Sell Win Rate**: The percentage of individual sell executions that were profitable, showing the count of profitable sells out of total sells.
+* **Cumulative Return Line Chart**: A high-performance chart powered by ApexCharts visualizing your portfolio's performance over time.
+* **Live Searchable Trade Ledger**: Filter and search through your round-trip trade records instantly by symbol.
+
+### How Cumulative P&L % is Calculated
+
+The cumulative line chart calculates performance chronologically based on the close date of each round-trip transaction:
+
+1. **Chronological Sorting**: Completed trades are ordered by their close date.
+2. **Running Aggregates**:
+    * **Running P&L ($)** = running sum of realized profit/loss of all closed trades.
+    * **Running Capital Employed ($)** = running sum of the initial cost basis of all closed trades.
+3. **Cumulative Return Percentage**: For each trade point, the running Y-axis value is computed as:
+   $$\text{Cumulative P\&L \%} = \left( \frac{\text{Running P\&L (\$)}}{\text{Running Capital Employed (\$)}} \right) \times 100$$
+   This represents the running return relative to the total cost of all capital traded up to that point in time.
