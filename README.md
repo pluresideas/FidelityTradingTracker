@@ -20,10 +20,10 @@ A lightweight, robust Java application that parses Fidelity transaction history 
 
 ## Project Structure
 
-- **[org/example/parser](file:///Users/peter/Documents/Dev/FidelityTradingTracker/src/main/java/org/example/parser)**: Handles raw text and CSV parser state machines.
-- **[org/example/model](file:///Users/peter/Documents/Dev/FidelityTradingTracker/src/main/java/org/example/model)**: Data models representing transactions, account records, and round-trip trades.
-- **[org/example/service](file:///Users/peter/Documents/Dev/FidelityTradingTracker/src/main/java/org/example/service)**: Core service logic for computing average cost basis and portfolio performance metrics.
-- **[org/example/report](file:///Users/peter/Documents/Dev/FidelityTradingTracker/src/main/java/org/example/report)**: Text reporting engine to format results into comprehensive, sorted summaries.
+- **[com/pluresideas/fidelitytradingtracker/parser](file:///Users/peter/Documents/Dev/FidelityTradingTracker/src/main/java/com/pluresideas/fidelitytradingtracker/parser)**: Handles raw text and CSV parser state machines.
+- **[com/pluresideas/fidelitytradingtracker/model](file:///Users/peter/Documents/Dev/FidelityTradingTracker/src/main/java/com/pluresideas/fidelitytradingtracker/model)**: Data models representing transactions, account records, and round-trip trades.
+- **[com/pluresideas/fidelitytradingtracker/service](file:///Users/peter/Documents/Dev/FidelityTradingTracker/src/main/java/com/pluresideas/fidelitytradingtracker/service)**: Core service logic for computing average cost basis and portfolio performance metrics.
+- **[com/pluresideas/fidelitytradingtracker/report](file:///Users/peter/Documents/Dev/FidelityTradingTracker/src/main/java/com/pluresideas/fidelitytradingtracker/report)**: Text reporting engine to format results into comprehensive, sorted summaries.
 - **[input_files](file:///Users/peter/Documents/Dev/FidelityTradingTracker/input_files)**: Standard directory for local configuration and data, including:
     - **Transaction Export**: A CSV log exported directly from a Fidelity account history page.
     - **Ignore List**: A plain text configuration containing symbols to omit from reporting metrics.
@@ -50,13 +50,13 @@ To compile and run the application using Maven, execute the following command fr
 With ignore symbols config file:
 
 ```bash
-mvn compile exec:java -Dexec.mainClass="org.pluresideas.fidelitytradingtracker.Main" -Dexec.args="input_files/Accounts_History.csv input_files/IgnoreSymbols.txt"
+mvn compile exec:java -Dexec.mainClass="com.pluresideas.fidelitytradingtracker.Main" -Dexec.args="input_files/Accounts_History.csv input_files/IgnoreSymbols.txt"
 ```
 
 Without ignore symbols config file:
 
 ```bash
-mvn compile exec:java -Dexec.mainClass="org.pluresideas.fidelitytradingtracker.Main" -Dexec.args="input_files/Accounts_History.csv"
+mvn compile exec:java -Dexec.mainClass="com.pluresideas.fidelitytradingtracker.Main" -Dexec.args="input_files/Accounts_History.csv"
 ```
 
 ### Option 2: Run with Java
@@ -71,18 +71,43 @@ mvn compile dependency:copy-dependencies
 
 ```bash
 # With ignore symbols config file
-java -cp "target/classes:target/dependency/*" fidelitytradingtracker.pluresideas.com.Main input_files/Accounts_History.csv input_files/IgnoreSymbols.txt
+java -cp "target/classes:target/dependency/*" com.pluresideas.fidelitytradingtracker.Main input_files/Accounts_History.csv input_files/IgnoreSymbols.txt
 
 # Without ignore symbols config file
-java -cp "target/classes:target/dependency/*" fidelitytradingtracker.pluresideas.com.Main input_files/Accounts_History.csv
+java -cp "target/classes:target/dependency/*" com.pluresideas.fidelitytradingtracker.Main input_files/Accounts_History.csv
 ```
 
 #### **On Windows** (uses `;` as path separator):
 
 ```bash
 # With ignore symbols config file
-java -cp "target/classes;target/dependency/*" fidelitytradingtracker.pluresideas.com.Main input_files/Accounts_History.csv input_files/IgnoreSymbols.txt
+java -cp "target/classes;target/dependency/*" com.pluresideas.fidelitytradingtracker.Main input_files/Accounts_History.csv input_files/IgnoreSymbols.txt
 
 # Without ignore symbols config file
-java -cp "target/classes;target/dependency/*" fidelitytradingtracker.pluresideas.com.Main input_files/Accounts_History.csv
+java -cp "target/classes;target/dependency/*" com.pluresideas.fidelitytradingtracker.Main input_files/Accounts_History.csv
+```
+
+### Option 3: Build a Native Executable (GraalVM)
+
+Compile the project into a standalone platform-native binary (e.g. `fidelity-tracker` on macOS/Linux or `fidelity-tracker.exe` on Windows). This executable starts instantly and runs without requiring any Java JRE or Maven installed on the target machine.
+
+#### Prerequisites
+1. Install a GraalVM JDK (e.g., `brew install --cask graalvm-jdk` on macOS or via [SDKMAN](https://sdkman.io/) using `sdk install java 22.0.2-graalce`).
+2. Ensure you have local developer compiler tools (e.g., `xcode-select --install` on macOS).
+3. Set your `JAVA_HOME` environment variable to the GraalVM JDK directory (e.g., `export JAVA_HOME="/Library/Java/JavaVirtualMachines/graalvm-25.jdk/Contents/Home"`).
+
+#### Compilation
+Build the native binary by running:
+```bash
+mvn -Pnative native:compile
+```
+
+#### Run the Executable
+Once completed, run the binary generated in the `target/` directory:
+```bash
+# With ignore symbols
+./target/fidelity-tracker input_files/Accounts_History.csv input_files/IgnoreSymbols.txt
+
+# Without ignore symbols
+./target/fidelity-tracker input_files/Accounts_History.csv
 ```
