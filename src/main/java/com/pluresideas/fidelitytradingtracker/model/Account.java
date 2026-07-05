@@ -1,23 +1,25 @@
 package com.pluresideas.fidelitytradingtracker.model;
 
+import java.math.BigDecimal;
+
 public class Account {
     private final String name;
     private final String accountNumber;
     private int tradesCount;
-    private double buysValue;
-    private double sellsValue;
+    private BigDecimal buysValue = BigDecimal.ZERO;
+    private BigDecimal sellsValue = BigDecimal.ZERO;
 
     public Account(String name, String accountNumber) {
         this.name = name;
         this.accountNumber = accountNumber;
     }
 
-    public void addTrade(Action action, double amount) {
+    public void addTrade(Action action, BigDecimal amount) {
         tradesCount++;
         if (action == Action.BUY) {
-            buysValue += amount;
+            buysValue = buysValue.add(amount);
         } else if (action == Action.SELL) {
-            sellsValue += amount;
+            sellsValue = sellsValue.add(amount);
         }
     }
 
@@ -33,15 +35,15 @@ public class Account {
         return tradesCount;
     }
 
-    public double getBuysValue() {
+    public BigDecimal getBuysValue() {
         return buysValue;
     }
 
-    public double getSellsValue() {
+    public BigDecimal getSellsValue() {
         return sellsValue;
     }
 
-    public double getNetCashFlow() {
-        return sellsValue - buysValue;
+    public BigDecimal getNetCashFlow() {
+        return sellsValue.subtract(buysValue);
     }
 }

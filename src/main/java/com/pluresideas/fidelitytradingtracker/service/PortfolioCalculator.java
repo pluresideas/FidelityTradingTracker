@@ -5,6 +5,8 @@ import com.pluresideas.fidelitytradingtracker.model.Action;
 import com.pluresideas.fidelitytradingtracker.model.RoundTrip;
 import com.pluresideas.fidelitytradingtracker.model.Transaction;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,16 +15,15 @@ import java.util.Map;
 public class PortfolioCalculator {
 
     public CalculationResults calculate(List<Transaction> transactions) {
-        Map<String, Double> symbolSharesOwned = new HashMap<>();
-        Map<String, Double> symbolAvgCostBasis = new HashMap<>();
-        Map<String, Double> symbolRealizedPnL = new HashMap<>();
-
-        Map<String, Double> symbolTotalSellQty = new HashMap<>();
+        Map<String, BigDecimal> symbolSharesOwned = new HashMap<>();
+        Map<String, BigDecimal> symbolAvgCostBasis = new HashMap<>();
+        Map<String, BigDecimal> symbolRealizedPnL = new HashMap<>();
+        Map<String, BigDecimal> symbolTotalSellQty = new HashMap<>();
 
         Map<String, Account> accounts = new HashMap<>();
 
-        double totalBuys = 0;
-        double totalSells = 0;
+        BigDecimal totalBuys = BigDecimal.ZERO;
+        BigDecimal totalSells = BigDecimal.ZERO;
         int totalBuysCount = 0;
         int totalSellsCount = 0;
         int winningSellsCount = 0;
@@ -33,8 +34,8 @@ public class PortfolioCalculator {
 
         for (Transaction t : transactions) {
             String sym = t.symbol();
-            double qty = t.quantity();
-            double amt = Math.abs(t.amount());
+            BigDecimal qty = t.quantity();
+            BigDecimal amt = t.amount().abs();
 
             Account acc = accounts.get(t.account());
             if (acc == null) {
@@ -44,16 +45,18 @@ public class PortfolioCalculator {
             acc.addTrade(t.action(), amt);
 
             if (t.action() == Action.BUY) {
-                totalBuys += amt;
+                totalBuys = totalBuys.add(amt);
                 totalBuysCount++;
 
-                double currentShares = symbolSharesOwned.getOrDefault(sym, 0.0);
-                double currentAvgCost = symbolAvgCostBasis.getOrDefault(sym, 0.0);
-                double newShares = currentShares + qty;
+                BigDecimal currentShares = symbolSharesOwned.getOrDefault(sym, BigDecimal.ZERO);
+                BigDecimal currentAvgCost = symbolAvgCostBasis.getOrDefault(sym, BigDecimal.ZERO);
+                BigDecimal newShares = currentShares.add(qty);
 
-                double newAvgCost = 0.0;
-                if (newShares > 0) {
-                    newAvgCost = ((currentShares * currentAvgCost) + amt) / newShares;
+                BigDecimal newAvgCost = BigDecimal.ZERO;
+                if (newShares.compareTo(BigDecimal.ZERO) > 0) {
+                    newAvgCost = currentShares.multiply(currentAvgCost)
+                            .add(amt)
+                            .divide(newShares, MathContext.DECIMAL128);
                 }
                 symbolSharesOwned.put(sym, newShares);
                 symbolAvgCostBasis.put(sym, newAvgCost);
@@ -67,25 +70,26 @@ public class PortfolioCalculator {
                 }
                 rt.addBuy(t);
             } else {
-                totalSells += amt;
+                totalSells = totalSells.add(amt);
                 totalSellsCount++;
 
-                symbolTotalSellQty.put(sym, symbolTotalSellQty.getOrDefault(sym, 0.0) + qty);
+                symbolTotalSellQty.put(sym, symbolTotalSellQty.getOrDefault(sym, BigDecimal.ZERO).add(qty));
 
-                double currentShares = symbolSharesOwned.getOrDefault(sym, 0.0);
-                double currentAvgCost = symbolAvgCostBasis.getOrDefault(sym, 0.0);
+                BigDecimal currentShares = symbolSharesOwned.getOrDefault(sym, BigDecimal.ZERO);
+                BigDecimal currentAvgCost = symbolAvgCostBasis.getOrDefault(sym, BigDecimal.ZERO);
 
-                double costBasis = 0.0;
+                BigDecimal costBasis = BigDecimal.ZERO;
                 boolean incomplete = false;
-                if (currentShares > 0) {
-                    double sharesFromHolding = Math.min(qty, currentShares);
-                    costBasis += sharesFromHolding * currentAvgCost;
-                    if (qty > currentShares) {
-                        costBasis += (qty - currentShares) * t.price();
+                if (currentShares.compareTo(BigDecimal.ZERO) > 0) {
+                    BigDecimal sharesFromHolding = qty.min(currentShares);
+                    costBasis = costBasis.add(sharesFromHolding.multiply(currentAvgCost));
+                    if (qty.compareTo(currentShares) > 0) {
+                        BigDecimal missingQty = qty.subtract(currentShares);
+                        costBasis = costBasis.add(missingQty.multiply(t.price()));
                         incomplete = true;
                     }
                 } else {
-                    costBasis += qty * t.price();
+                    costBasis = costBasis.add(qty.multiply(t.price()));
                     incomplete = true;
                 }
 
@@ -93,27 +97,28 @@ public class PortfolioCalculator {
                     hasIncompleteHistory = true;
                 }
 
-                double pnl = amt - costBasis;
-                symbolRealizedPnL.put(sym, symbolRealizedPnL.getOrDefault(sym, 0.0) + pnl);
-                if (pnl > 0.0) {
+                BigDecimal pnl = amt.subtract(costBasis);
+                symbolRealizedPnL.put(sym, symbolRealizedPnL.getOrDefault(sym, BigDecimal.ZERO).add(pnl));
+                if (pnl.compareTo(BigDecimal.ZERO) > 0) {
                     winningSellsCount++;
                 }
 
-                double newShares = Math.max(0.0, currentShares - qty);
-                if (newShares <= 1e-6) {
-                    newShares = 0.0;
-                    symbolAvgCostBasis.put(sym, 0.0);
+                BigDecimal newShares = currentShares.subtract(qty);
+                if (newShares.compareTo(BigDecimal.ZERO) <= 0) {
+                    newShares = BigDecimal.ZERO;
+                    symbolAvgCostBasis.put(sym, BigDecimal.ZERO);
                 }
                 symbolSharesOwned.put(sym, newShares);
 
                 // RoundTrip logic
                 RoundTrip rt = activeRoundTrips.get(sym);
                 if (rt != null) {
-                    double sellQtyForRoundTrip = qty;
-                    double pnlForRoundTrip = pnl;
-                    if (qty > currentShares) {
+                    BigDecimal sellQtyForRoundTrip = qty;
+                    BigDecimal pnlForRoundTrip = pnl;
+                    if (qty.compareTo(currentShares) > 0) {
                         sellQtyForRoundTrip = currentShares;
-                        pnlForRoundTrip = (currentShares * t.price()) - (currentShares * currentAvgCost);
+                        pnlForRoundTrip = currentShares.multiply(t.price())
+                                .subtract(currentShares.multiply(currentAvgCost));
                         rt.setEstimated(true);
                     }
                     rt.addSell(sellQtyForRoundTrip, t.price());
@@ -121,7 +126,7 @@ public class PortfolioCalculator {
                     if (incomplete) {
                         rt.setEstimated(true);
                     }
-                    if (newShares == 0.0) {
+                    if (newShares.compareTo(BigDecimal.ZERO) == 0) {
                         rt.close(t.date());
                         activeRoundTrips.remove(sym);
                     }
@@ -129,16 +134,16 @@ public class PortfolioCalculator {
             }
         }
 
-        double totalRealizedPnL = 0.0;
+        BigDecimal totalRealizedPnL = BigDecimal.ZERO;
         int winningSymbolsCount = 0;
         int closedSymbolsCount = 0;
-        for (Map.Entry<String, Double> entry : symbolRealizedPnL.entrySet()) {
-            totalRealizedPnL += entry.getValue();
+        for (Map.Entry<String, BigDecimal> entry : symbolRealizedPnL.entrySet()) {
+            totalRealizedPnL = totalRealizedPnL.add(entry.getValue());
             String sym = entry.getKey();
-            double sellQty = symbolTotalSellQty.getOrDefault(sym, 0.0);
-            if (sellQty > 0) {
+            BigDecimal sellQty = symbolTotalSellQty.getOrDefault(sym, BigDecimal.ZERO);
+            if (sellQty.compareTo(BigDecimal.ZERO) > 0) {
                 closedSymbolsCount++;
-                if (entry.getValue() > 0.0) {
+                if (entry.getValue().compareTo(BigDecimal.ZERO) > 0) {
                     winningSymbolsCount++;
                 }
             }

@@ -4,6 +4,7 @@ import com.pluresideas.fidelitytradingtracker.model.Action;
 import com.pluresideas.fidelitytradingtracker.model.Transaction;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -45,9 +46,9 @@ public class FidelityCsvParser implements CsvParser {
                 continue;
             }
 
-            double price = parseDoubleSafely(fields.get(7));
-            double quantity = Math.abs(parseDoubleSafely(fields.get(8)));
-            double amount = parseDoubleSafely(fields.get(12));
+            BigDecimal price = parseBigDecimalSafely(fields.get(7));
+            BigDecimal quantity = parseBigDecimalSafely(fields.get(8)).abs();
+            BigDecimal amount = parseBigDecimalSafely(fields.get(12));
 
             Transaction tx = new Transaction(
                     dateField,
@@ -65,7 +66,28 @@ public class FidelityCsvParser implements CsvParser {
         // Reversing the parsed list because Fidelity CSV exports are always in reverse chronological order (newest first).
         // Reversing naturally puts them in correct chronological order (oldest first) while preserving transaction blocks.
         java.util.Collections.reverse(transactions);
-        return transactions;
+
+        // Group contiguous transactions of the same date and sort each group to prioritize BUY before SELL.
+        List<Transaction> sortedTransactions = new ArrayList<>();
+        int i = 0;
+        int n = transactions.size();
+        while (i < n) {
+            String currentDate = transactions.get(i).date();
+            List<Transaction> group = new ArrayList<>();
+            while (i < n && transactions.get(i).date().equals(currentDate)) {
+                group.add(transactions.get(i));
+                i++;
+            }
+            // Sort this day group: BUY before SELL
+            group.sort((t1, t2) -> {
+                if (t1.action() == t2.action()) {
+                    return 0;
+                }
+                return t1.action() == Action.BUY ? -1 : 1;
+            });
+            sortedTransactions.addAll(group);
+        }
+        return sortedTransactions;
     }
 
     private List<String> parseCsvLine(String line) {
@@ -87,23 +109,15 @@ public class FidelityCsvParser implements CsvParser {
         return result;
     }
 
-    private double parseDoubleSafely(String val) {
+    private BigDecimal parseBigDecimalSafely(String val) {
         if (val == null || val.trim().isEmpty() || val.equals("\"\"")) {
-            return 0.0;
+            return BigDecimal.ZERO;
         }
         try {
             String cleanVal = val.replace("$", "").replace(",", "").replace("\"", "").trim();
-            return Double.parseDouble(cleanVal);
+            return new BigDecimal(cleanVal);
         } catch (NumberFormatException e) {
-            return 0.0;
+            return BigDecimal.ZERO;
         }
-    }
-
-    private String getComparableDate(String dateStr) {
-        String[] parts = dateStr.split("-");
-        if (parts.length == 3) {
-            return parts[2] + parts[0] + parts[1]; // YYYYMMDD
-        }
-        return dateStr;
     }
 }

@@ -1,5 +1,7 @@
 package com.pluresideas.fidelitytradingtracker.model;
 
+import java.math.BigDecimal;
+
 /**
  * Represents a single trading transaction parsed from the Fidelity history CSV.
  */
@@ -9,8 +11,7 @@ public record Transaction(
         String accountNum,
         Action action,
         String symbol,
-        double price,
-        double quantity,
-        double amount
-) {
-}
+        BigDecimal price,
+        BigDecimal quantity,
+        BigDecimal amount
+) {}

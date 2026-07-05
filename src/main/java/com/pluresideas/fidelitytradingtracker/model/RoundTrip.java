@@ -1,16 +1,19 @@
 package com.pluresideas.fidelitytradingtracker.model;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+
 public class RoundTrip {
 
     private final String symbol;
     private String openDate;
     private String closeDate = "OPEN";
 
-    private double totalBuyQty = 0.0;
-    private double totalSellQty = 0.0;
-    private double totalBuyValue = 0.0;
-    private double totalSellValue = 0.0;
-    private double realizedPnL = 0.0;
+    private BigDecimal totalBuyQty = BigDecimal.ZERO;
+    private BigDecimal totalSellQty = BigDecimal.ZERO;
+    private BigDecimal totalBuyValue = BigDecimal.ZERO;
+    private BigDecimal totalSellValue = BigDecimal.ZERO;
+    private BigDecimal realizedPnL = BigDecimal.ZERO;
     private boolean isClosed = false;
     private boolean isEstimated = false;
 
@@ -22,21 +25,21 @@ public class RoundTrip {
         if (openDate == null) {
             openDate = t.date();
         }
-        totalBuyQty += t.quantity();
-        totalBuyValue += Math.abs(t.amount());
+        totalBuyQty = totalBuyQty.add(t.quantity());
+        totalBuyValue = totalBuyValue.add(t.amount().abs());
     }
 
     public void addSell(Transaction t) {
         addSell(t.quantity(), t.price());
     }
 
-    public void addSell(double qty, double price) {
-        totalSellQty += qty;
-        totalSellValue += qty * price;
+    public void addSell(BigDecimal qty, BigDecimal price) {
+        totalSellQty = totalSellQty.add(qty);
+        totalSellValue = totalSellValue.add(qty.multiply(price));
     }
 
-    public void addPnL(double pnl) {
-        realizedPnL += pnl;
+    public void addPnL(BigDecimal pnl) {
+        realizedPnL = realizedPnL.add(pnl);
     }
 
     public void setEstimated(boolean estimated) {
@@ -60,23 +63,23 @@ public class RoundTrip {
         return closeDate;
     }
 
-    public double getTotalBuyQty() {
+    public BigDecimal getTotalBuyQty() {
         return totalBuyQty;
     }
 
-    public double getTotalSellQty() {
+    public BigDecimal getTotalSellQty() {
         return totalSellQty;
     }
 
-    public double getTotalBuyValue() {
+    public BigDecimal getTotalBuyValue() {
         return totalBuyValue;
     }
 
-    public double getTotalSellValue() {
+    public BigDecimal getTotalSellValue() {
         return totalSellValue;
     }
 
-    public double getRealizedPnL() {
+    public BigDecimal getRealizedPnL() {
         return realizedPnL;
     }
 
@@ -88,11 +91,11 @@ public class RoundTrip {
         return isEstimated;
     }
 
-    public double getAvgBuyPrice() {
-        return totalBuyQty > 0 ? totalBuyValue / totalBuyQty : 0.0;
+    public BigDecimal getAvgBuyPrice() {
+        return totalBuyQty.compareTo(BigDecimal.ZERO) > 0 ? totalBuyValue.divide(totalBuyQty, MathContext.DECIMAL128) : BigDecimal.ZERO;
     }
 
-    public double getAvgSellPrice() {
-        return totalSellQty > 0 ? totalSellValue / totalSellQty : 0.0;
+    public BigDecimal getAvgSellPrice() {
+        return totalSellQty.compareTo(BigDecimal.ZERO) > 0 ? totalSellValue.divide(totalSellQty, MathContext.DECIMAL128) : BigDecimal.ZERO;
     }
 }
