@@ -60,6 +60,7 @@
                     <imageName>fidelity-tracker</imageName>
                     <buildArgs>
                         <buildArg>--no-fallback</buildArg>
+                        <buildArg>-H:IncludeResources=logback.xml</buildArg>
                     </buildArgs>
                 </configuration>
             </plugin>
