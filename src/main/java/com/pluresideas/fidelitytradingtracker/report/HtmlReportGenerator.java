@@ -138,7 +138,7 @@ public class HtmlReportGenerator {
                 "<tr>" +
                 "<td>%s</td>" +
                 "<td>%s</td>" +
-                "<td class=\"fw-bold text-white\">%s</td>" +
+                "<td class=\"fw-bold text-primary\">%s</td>" +
                 "<td>%s</td>" +
                 "<td>%s</td>" +
                 "<td>%s</td>" +
