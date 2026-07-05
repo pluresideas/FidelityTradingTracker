@@ -119,7 +119,7 @@ public class FidelityTrackerReport implements Report {
     }
 
     private void renderDetailedSymbolReport(CalculationResults r) {
-        logger.info("[3] DETAILED TRANSACTIONS BY SYMBOL (Round-Trip Ledger)");
+        logger.info(String.format("[3] DETAILED TRANSACTIONS BY SYMBOL (Round-Trip Ledger) - %d Total Completed Trades", r.roundTrips().size()));
         logger.info(HORIZONTAL_SEPARATOR);
         logger.info(String.format("  %-10s %-10s %-8s %10s %12s %12s %14s %14s %15s %10s",
                 "Open Date", "Close Date", "Symbol", "Qty", "Avg Buy", "Avg Sell", "Cost Basis", "Proceeds", "Realized P&L", "% P&L"));
