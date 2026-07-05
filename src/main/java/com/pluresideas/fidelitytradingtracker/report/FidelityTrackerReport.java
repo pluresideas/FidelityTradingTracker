@@ -51,7 +51,6 @@ public class FidelityTrackerReport implements Report {
         logger.info(String.format("  Total Cash Outflow:        %s (To Buys)", formatMoney(-r.totalBuys())));
         logger.info(String.format("  Net Cash Flow:             %s", formatMoney(r.totalSells() - r.totalBuys())));
 
-        double symbolWinRate = r.closedSymbolsCount() > 0 ? ((double) r.winningSymbolsCount() / r.closedSymbolsCount() * 100.0) : 0.0;
         double sellWinRate = r.totalSellsCount() > 0 ? ((double) r.winningSellsCount() / r.totalSellsCount() * 100.0) : 0.0;
 
         int closedRoundTripsCount = 0;
@@ -67,7 +66,6 @@ public class FidelityTrackerReport implements Report {
         double transactionWinRate = closedRoundTripsCount > 0 ? ((double) winningRoundTripsCount / closedRoundTripsCount * 100.0) : 0.0;
 
         logger.info(String.format("  Total Realized P&L:        %s%s", formatMoney(r.totalRealizedPnL()), r.hasIncompleteHistory() ? "*" : ""));
-        logger.info(String.format("  Win Rate (by Symbol):      %.1f%% (%d of %d profitable symbols)", symbolWinRate, r.winningSymbolsCount(), r.closedSymbolsCount()));
         logger.info(String.format("  Win Rate (by Transaction): %.1f%% (%d of %d completed transactions)", transactionWinRate, winningRoundTripsCount, closedRoundTripsCount));
         logger.info(String.format("  Win Rate (by Sell):        %.1f%% (%d of %d profitable sells)", sellWinRate, r.winningSellsCount(), r.totalSellsCount()));
         logger.info("------------------------------------------------------------------------------------------------------------------------");
