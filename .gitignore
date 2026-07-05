@@ -1,3 +1,5 @@
 target/
 .idea/
 input_files/
+output.txt
+report.html
