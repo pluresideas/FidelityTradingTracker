@@ -301,15 +301,20 @@ public class HtmlReportGenerator {
 
         /* Search input styling */
         .search-control {
-            background: rgba(15, 23, 42, 0.4);
-            border: 1px solid var(--border-color);
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: #f8fafc;
             border-radius: 8px;
             padding: 0.6rem 1rem;
         }
 
+        .search-control::placeholder {
+            color: #94a3b8;
+            opacity: 0.85;
+        }
+
         .search-control:focus {
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(15, 23, 42, 0.8);
             border-color: var(--accent-primary);
             box-shadow: 0 0 0 2px var(--accent-glow);
             color: #f8fafc;
@@ -342,9 +347,9 @@ public class HtmlReportGenerator {
         <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary border-opacity-10">
             <div>
                 <h1 class="text-white mb-1"><i class="fa-solid fa-chart-line text-primary me-2"></i>Fidelity Trading Tracker</h1>
-                <p class="text-muted mb-0">Interactive Portfolio Performance Dashboard</p>
+                <p class="text-light mb-0">Interactive Portfolio Performance Dashboard</p>
             </div>
-            <span class="badge bg-secondary bg-opacity-20 text-secondary border border-secondary border-opacity-20 px-3 py-2 rounded-pill">
+            <span class="badge bg-secondary bg-opacity-30 text-light border border-secondary border-opacity-40 px-3 py-2 rounded-pill">
                 <i class="fa-solid fa-clock me-1"></i>Report Period: {{period}}
             </span>
         </div>
@@ -355,7 +360,7 @@ public class HtmlReportGenerator {
                 <div class="glass-card stat-card {{pnl_class}}">
                     <div class="stat-label">Net Realized P&L</div>
                     <div class="stat-value {{pnl_text_class}}">{{total_pnl}}</div>
-                    <div class="stat-subtext mt-1 text-muted" style="font-size: 0.8rem; font-weight: 500;">
+                    <div class="stat-subtext mt-1 text-light" style="font-size: 0.8rem; font-weight: 500;">
                         Avg Gain: <span class="text-success fw-bold">{{avg_gain}}</span> | Avg Loss: <span class="text-danger fw-bold">{{avg_loss}}</span>
                     </div>
                 </div>
@@ -364,7 +369,7 @@ public class HtmlReportGenerator {
                 <div class="glass-card stat-card">
                     <div class="stat-label">Win Rate</div>
                     <div class="stat-value text-white">{{win_rate}}</div>
-                    <div class="stat-subtext mt-1 text-muted" style="font-size: 0.8rem; font-weight: 500;">
+                    <div class="stat-subtext mt-1 text-light" style="font-size: 0.8rem; font-weight: 500;">
                         <span class="text-success fw-bold">{{winning_trades}}</span> wins out of <span class="fw-bold">{{closed_trades_count}}</span> completed trades
                     </div>
                 </div>
@@ -373,7 +378,7 @@ public class HtmlReportGenerator {
                 <div class="glass-card stat-card">
                     <div class="stat-label">Total Completed Trades</div>
                     <div class="stat-value text-white">{{closed_trades_count}}</div>
-                    <div class="stat-subtext mt-1 text-muted" style="font-size: 0.8rem; font-weight: 500;">
+                    <div class="stat-subtext mt-1 text-light" style="font-size: 0.8rem; font-weight: 500;">
                         From <span class="fw-bold">{{total_trades}}</span> total order executions in file
                     </div>
                 </div>
@@ -382,7 +387,7 @@ public class HtmlReportGenerator {
                 <div class="glass-card stat-card">
                     <div class="stat-label">Sell Win Rate</div>
                     <div class="stat-value text-white">{{sell_win_rate}}</div>
-                    <div class="stat-subtext mt-1 text-muted" style="font-size: 0.8rem; font-weight: 500;">
+                    <div class="stat-subtext mt-1 text-light" style="font-size: 0.8rem; font-weight: 500;">
                         <span class="text-success fw-bold">{{winning_sells}}</span> profitable sells out of <span class="fw-bold">{{total_sells}}</span> sells
                     </div>
                 </div>
