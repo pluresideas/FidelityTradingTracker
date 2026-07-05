@@ -5,14 +5,18 @@ import com.pluresideas.fidelitytradingtracker.model.RoundTrip;
 import com.pluresideas.fidelitytradingtracker.service.CalculationResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public class FidelityTrackerReport implements Report {
     private static final Logger logger = LoggerFactory.getLogger(FidelityTrackerReport.class);
     public static final String SEPARATOR = "========================================================================================================================";
+    public static final String HORIZONTAL_SEPARATOR = "-------------------------------------------------------------------------------------------------------------------------------";
     private final String inputSource;
 
     public FidelityTrackerReport(String inputSource) {
@@ -44,7 +48,7 @@ public class FidelityTrackerReport implements Report {
 
     private void renderOverallSummary(CalculationResults r) {
         logger.info("[1] OVERALL TRANSACTION SUMMARY");
-        logger.info("------------------------------------------------------------------------------------------------------------------------");
+        logger.info(HORIZONTAL_SEPARATOR);
         logger.info(String.format("  Total Trades:              %d (Buys: %d, Sells: %d)", r.transactions().size(), r.totalBuysCount(), r.totalSellsCount()));
         logger.info(String.format("  Total Cash Inflow:         %s (From Sells)", formatMoney(r.totalSells())));
         logger.info(String.format("  Total Cash Outflow:        %s (To Buys)", formatMoney(r.totalBuys().negate())));
@@ -67,38 +71,38 @@ public class FidelityTrackerReport implements Report {
         logger.info(String.format("  Total Realized P&L:        %s%s", formatMoney(r.totalRealizedPnL()), r.hasIncompleteHistory() ? "*" : ""));
         logger.info(String.format("  Win Rate (by Transaction): %.1f%% (%d of %d completed transactions)", transactionWinRate, winningRoundTripsCount, closedRoundTripsCount));
         logger.info(String.format("  Win Rate (by Sell):        %.1f%% (%d of %d profitable sells)", sellWinRate, r.winningSellsCount(), r.totalSellsCount()));
-        logger.info("------------------------------------------------------------------------------------------------------------------------");
+        logger.info(HORIZONTAL_SEPARATOR);
         logger.info("");
     }
 
     private void renderAccountSummary(CalculationResults r) {
         logger.info("[2] ACCOUNT SUMMARY");
-        logger.info("------------------------------------------------------------------------------------------------------------------------");
+        logger.info(HORIZONTAL_SEPARATOR);
         logger.info(String.format("  %-25s %-12s %8s %18s %18s %18s", "Account Name", "Account #", "Trades", "Total Buys", "Total Sells", "Net Cash Flow"));
-        logger.info("  ----------------------------------------------------------------------------------------------------------------------");
+        logger.info(HORIZONTAL_SEPARATOR);
 
         List<Account> sortedAccounts = new ArrayList<>(r.accounts().values());
         sortedAccounts.sort(Comparator.comparing(Account::getName));
         for (Account acc : sortedAccounts) {
             logger.info(String.format("  %-25s %-12s %8d %18s %18s %18s",
-                acc.getName(),
-                acc.getAccountNumber() != null ? acc.getAccountNumber() : "N/A",
-                acc.getTradesCount(),
-                formatMoney(acc.getBuysValue()),
-                formatMoney(acc.getSellsValue()),
-                formatMoney(acc.getNetCashFlow())
+                    acc.getName(),
+                    acc.getAccountNumber() != null ? acc.getAccountNumber() : "N/A",
+                    acc.getTradesCount(),
+                    formatMoney(acc.getBuysValue()),
+                    formatMoney(acc.getSellsValue()),
+                    formatMoney(acc.getNetCashFlow())
             ));
         }
-        logger.info("------------------------------------------------------------------------------------------------------------------------");
+        logger.info(HORIZONTAL_SEPARATOR);
         logger.info("");
     }
 
     private void renderDetailedSymbolReport(CalculationResults r) {
         logger.info("[3] DETAILED TRANSACTIONS BY SYMBOL (Round-Trip Ledger)");
-        logger.info("------------------------------------------------------------------------------------------------------------------------");
-        logger.info(String.format("  %-10s %-10s %-8s %10s %12s %12s %14s %14s %15s",
-            "Open Date", "Close Date", "Symbol", "Qty", "Avg Buy", "Avg Sell", "Cost Basis", "Proceeds", "Realized P&L"));
-        logger.info("  ----------------------------------------------------------------------------------------------------------------------");
+        logger.info(HORIZONTAL_SEPARATOR);
+        logger.info(String.format("  %-10s %-10s %-8s %10s %12s %12s %14s %14s %15s %10s",
+                "Open Date", "Close Date", "Symbol", "Qty", "Avg Buy", "Avg Sell", "Cost Basis", "Proceeds", "Realized P&L", "% P&L"));
+        logger.info(HORIZONTAL_SEPARATOR);
 
         List<RoundTrip> sortedTransactionsBySymbol = new ArrayList<>(r.roundTrips());
         sortedTransactionsBySymbol.sort((t1, t2) -> {
@@ -115,22 +119,23 @@ public class FidelityTrackerReport implements Report {
             String pnlStr = formatMoney(rt.getRealizedPnL()) + (rt.isEstimated() ? "*" : "");
             String avgSellStr = rt.getTotalSellQty().compareTo(BigDecimal.ZERO) > 0 ? formatMoney(rt.getAvgSellPrice()) : "-";
             String proceedsStr = rt.getTotalSellQty().compareTo(BigDecimal.ZERO) > 0 ? formatMoney(rt.getTotalSellValue()) : "-";
+            String pctStr = rt.getTotalSellQty().compareTo(BigDecimal.ZERO) > 0 ? formatPercentage(rt.getReturnPercentage()) : "-";
 
-            logger.info(String.format("  %-10s %-10s %-8s %10s %12s %12s %14s %14s %15s",
-                rt.getOpenDate() != null ? rt.getOpenDate() : "N/A", rt.getCloseDate(), rt.getSymbol(), formatQty(rt.getTotalBuyQty()),
-                formatMoney(rt.getAvgBuyPrice()), avgSellStr, formatMoney(rt.getTotalBuyValue()),
-                proceedsStr, pnlStr));
+            logger.info(String.format("  %-10s %-10s %-8s %10s %12s %12s %14s %14s %15s %10s",
+                    rt.getOpenDate() != null ? rt.getOpenDate() : "N/A", rt.getCloseDate(), rt.getSymbol(), formatQty(rt.getTotalBuyQty()),
+                    formatMoney(rt.getAvgBuyPrice()), avgSellStr, formatMoney(rt.getTotalBuyValue()),
+                    proceedsStr, pnlStr, pctStr));
         }
-        logger.info("------------------------------------------------------------------------------------------------------------------------");
+        logger.info(HORIZONTAL_SEPARATOR);
         logger.info("");
     }
 
     private void renderDetailedPnLReport(CalculationResults r) {
         logger.info("[4] DETAILED TRANSACTIONS BY P&L (Descending)");
-        logger.info("------------------------------------------------------------------------------------------------------------------------");
-        logger.info(String.format("  %-10s %-10s %-8s %10s %12s %12s %14s %14s %15s",
-            "Open Date", "Close Date", "Symbol", "Qty", "Avg Buy", "Avg Sell", "Cost Basis", "Proceeds", "Realized P&L"));
-        logger.info("  ----------------------------------------------------------------------------------------------------------------------");
+        logger.info(HORIZONTAL_SEPARATOR);
+        logger.info(String.format("  %-10s %-10s %-8s %10s %12s %12s %14s %14s %15s %10s",
+                "Open Date", "Close Date", "Symbol", "Qty", "Avg Buy", "Avg Sell", "Cost Basis", "Proceeds", "Realized P&L", "% P&L"));
+        logger.info(HORIZONTAL_SEPARATOR);
 
         List<RoundTrip> sellTransactionsSortedByPnL = new ArrayList<>();
         for (RoundTrip rt : r.roundTrips()) {
@@ -144,22 +149,23 @@ public class FidelityTrackerReport implements Report {
             String pnlStr = formatMoney(rt.getRealizedPnL()) + (rt.isEstimated() ? "*" : "");
             String avgSellStr = rt.getTotalSellQty().compareTo(BigDecimal.ZERO) > 0 ? formatMoney(rt.getAvgSellPrice()) : "-";
             String proceedsStr = rt.getTotalSellQty().compareTo(BigDecimal.ZERO) > 0 ? formatMoney(rt.getTotalSellValue()) : "-";
+            String pctStr = rt.getTotalSellQty().compareTo(BigDecimal.ZERO) > 0 ? formatPercentage(rt.getReturnPercentage()) : "-";
 
-            logger.info(String.format("  %-10s %-10s %-8s %10s %12s %12s %14s %14s %15s",
-                rt.getOpenDate() != null ? rt.getOpenDate() : "N/A", rt.getCloseDate(), rt.getSymbol(), formatQty(rt.getTotalBuyQty()),
-                formatMoney(rt.getAvgBuyPrice()), avgSellStr, formatMoney(rt.getTotalBuyValue()),
-                proceedsStr, pnlStr));
+            logger.info(String.format("  %-10s %-10s %-8s %10s %12s %12s %14s %14s %15s %10s",
+                    rt.getOpenDate() != null ? rt.getOpenDate() : "N/A", rt.getCloseDate(), rt.getSymbol(), formatQty(rt.getTotalBuyQty()),
+                    formatMoney(rt.getAvgBuyPrice()), avgSellStr, formatMoney(rt.getTotalBuyValue()),
+                    proceedsStr, pnlStr, pctStr));
         }
-        logger.info("------------------------------------------------------------------------------------------------------------------------");
+        logger.info(HORIZONTAL_SEPARATOR);
         logger.info("");
     }
 
     private void renderDetailedDateReport(CalculationResults r) {
         logger.info("[5] DETAILED TRANSACTIONS BY DATE (Chronological)");
-        logger.info("------------------------------------------------------------------------------------------------------------------------");
-        logger.info(String.format("  %-10s %-10s %-8s %10s %12s %12s %14s %14s %15s",
-            "Open Date", "Close Date", "Symbol", "Qty", "Avg Buy", "Avg Sell", "Cost Basis", "Proceeds", "Realized P&L"));
-        logger.info("  ----------------------------------------------------------------------------------------------------------------------");
+        logger.info(HORIZONTAL_SEPARATOR);
+        logger.info(String.format("  %-10s %-10s %-8s %10s %12s %12s %14s %14s %15s %10s",
+                "Open Date", "Close Date", "Symbol", "Qty", "Avg Buy", "Avg Sell", "Cost Basis", "Proceeds", "Realized P&L", "% P&L"));
+        logger.info(HORIZONTAL_SEPARATOR);
 
         List<RoundTrip> sortedTransactionsByDate = new ArrayList<>(r.roundTrips());
         sortedTransactionsByDate.sort((t1, t2) -> {
@@ -176,13 +182,14 @@ public class FidelityTrackerReport implements Report {
             String pnlStr = formatMoney(rt.getRealizedPnL()) + (rt.isEstimated() ? "*" : "");
             String avgSellStr = rt.getTotalSellQty().compareTo(BigDecimal.ZERO) > 0 ? formatMoney(rt.getAvgSellPrice()) : "-";
             String proceedsStr = rt.getTotalSellQty().compareTo(BigDecimal.ZERO) > 0 ? formatMoney(rt.getTotalSellValue()) : "-";
+            String pctStr = rt.getTotalSellQty().compareTo(BigDecimal.ZERO) > 0 ? formatPercentage(rt.getReturnPercentage()) : "-";
 
-            logger.info(String.format("  %-10s %-10s %-8s %10s %12s %12s %14s %14s %15s",
-                rt.getOpenDate() != null ? rt.getOpenDate() : "N/A", rt.getCloseDate(), rt.getSymbol(), formatQty(rt.getTotalBuyQty()),
-                formatMoney(rt.getAvgBuyPrice()), avgSellStr, formatMoney(rt.getTotalBuyValue()),
-                proceedsStr, pnlStr));
+            logger.info(String.format("  %-10s %-10s %-8s %10s %12s %12s %14s %14s %15s %10s",
+                    rt.getOpenDate() != null ? rt.getOpenDate() : "N/A", rt.getCloseDate(), rt.getSymbol(), formatQty(rt.getTotalBuyQty()),
+                    formatMoney(rt.getAvgBuyPrice()), avgSellStr, formatMoney(rt.getTotalBuyValue()),
+                    proceedsStr, pnlStr, pctStr));
         }
-        logger.info("------------------------------------------------------------------------------------------------------------------------");
+        logger.info(HORIZONTAL_SEPARATOR);
     }
 
     private String formatMoney(BigDecimal val) {
@@ -204,6 +211,18 @@ public class FidelityTrackerReport implements Report {
         DecimalFormat df = new DecimalFormat("#,##0.######");
         df.setRoundingMode(RoundingMode.HALF_UP);
         return df.format(val);
+    }
+
+    private String formatPercentage(BigDecimal val) {
+        if (val == null) {
+            return "-";
+        }
+        BigDecimal rounded = val.setScale(2, RoundingMode.HALF_UP);
+        if (rounded.compareTo(BigDecimal.ZERO) > 0) {
+            return String.format("+%,.2f%%", rounded.doubleValue());
+        } else {
+            return String.format("%,.2f%%", rounded.doubleValue());
+        }
     }
 
     private String getComparableDate(String dateStr) {

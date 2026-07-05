@@ -83,6 +83,14 @@ public class RoundTrip {
         return realizedPnL;
     }
 
+    public BigDecimal getReturnPercentage() {
+        if (totalBuyValue == null || totalBuyValue.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
+        return realizedPnL.multiply(new BigDecimal("100"))
+                .divide(totalBuyValue, MathContext.DECIMAL128);
+    }
+
     public boolean isClosed() {
         return isClosed;
     }
